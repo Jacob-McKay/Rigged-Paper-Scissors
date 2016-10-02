@@ -6,7 +6,7 @@ public class Bullet : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        var hit = collision.gameObject;
+        var hit = collision.transform.parent.gameObject;
         var health = hit.GetComponent<Health>();
         if (health != null)
         {
