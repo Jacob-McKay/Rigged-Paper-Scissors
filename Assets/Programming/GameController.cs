@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public class GameController : MonoBehaviour {
 
@@ -26,15 +27,20 @@ public class GameController : MonoBehaviour {
 
         _networkDiscovery = FindObjectOfType<OverriddenNetworkDiscovery>();
         _networkDiscovery.broadcastData = _playerName;
-        _networkDiscovery.Initialize();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        //foreach(var opponentListItem in opponentListContainer.GetComponentsInChildren<Button>())
+        //{
+        //    Destroy(opponentListItem.gameObject);
+        //}
+
         if (_networkDiscovery.broadcastsReceived == null)
         {
             return;
         }
+
         var optionNameIndex = 0;
         foreach(var addressAndDataPair in _networkDiscovery.broadcastsReceived)
         {
@@ -56,10 +62,21 @@ public class GameController : MonoBehaviour {
 
     public void TransitionToSearchOrHostChoiceMenu()
     {
+        if(NetworkManager.singleton.isNetworkActive)
+        {
+            NetworkManager.singleton.StopServer();
+        }
+        if(_networkDiscovery.isServer || _networkDiscovery.isClient)
+        {
+            _networkDiscovery.StopBroadcast();
+        }
+
         _playerName = playerNameInput.text;
         _currentMenu.SetActive(false);
         _currentMenu = searchForOrHostMatchMenu;
         _currentMenu.SetActive(true);
+        _networkDiscovery.broadcastData = _playerName;
+        _networkDiscovery.Initialize();
     }
 
     public void TransitionToSearchForMatchMenu()
@@ -67,6 +84,7 @@ public class GameController : MonoBehaviour {
         _currentMenu.SetActive(false);
         _currentMenu = searchForMatchMenu;
         _currentMenu.SetActive(true);
+        _networkDiscovery.StartAsClient();
     }
 
     public void TransitionToHostMatchMenu()
@@ -74,6 +92,8 @@ public class GameController : MonoBehaviour {
         _currentMenu.SetActive(false);
         _currentMenu = hostMatchMenu;
         _currentMenu.SetActive(true);
+        NetworkManager.singleton.StartServer();
+        _networkDiscovery.StartAsServer();
     }
 
     public void TransitionToUsernameCatpureMenu()
