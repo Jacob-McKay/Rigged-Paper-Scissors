@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Assets.Programming
 {
@@ -16,7 +17,7 @@ namespace Assets.Programming
 
         public string name;
 
-        public Image image;
+        public Sprite image;
 
         public Outcome Against(Hand otherHand)
         {

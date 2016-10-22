@@ -8,19 +8,44 @@ namespace Assets.Programming
 {
     public class Hands : MonoBehaviour
     {
-        public static Image rockImage;
-        public static Image paperImage;
-        public static Image scissorsImage;
+        public Sprite rockImage;
+        public Sprite paperImage;
+        public Sprite scissorsImage;
 
-        public static Hand rock = new Hand { hand = ValidHand.Rock, name = "Rock", image = rockImage};
-        public static Hand paper = new Hand { hand = ValidHand.Paper, name = "Paper", image = paperImage};
-        public static Hand scissors = new Hand { hand = ValidHand.Scissors, name = "Scissors", image = scissorsImage};
+        private List<Hand> _hands;
 
-        public static List<Hand> hands = new List<Hand> { rock, paper, scissors };
-
-        public static Hand RandomHand()
+   
+        public void Start()
         {
-            return hands[Random.Range(0, (hands.Count - 1))];
+            _hands = new List<Hand> { Rock, Paper, Scissors };
+        }
+
+        public Hand GetRandomHand()
+        {
+            return _hands[Random.Range(0, _hands.Count)];
+        }
+
+        public Hand Rock
+        {
+            get {
+                return new Hand { hand = ValidHand.Rock, name = "Rock", image = rockImage };
+            }
+        }
+
+        public Hand Paper
+        {
+            get
+            {
+                return new Hand { hand = ValidHand.Paper, name = "Paper", image = paperImage };
+            }
+        }
+
+        public Hand Scissors
+        {
+            get
+            {
+                return new Hand { hand = ValidHand.Scissors, name = "Scissors", image = scissorsImage };
+            }
         }
     }
 }

@@ -31,6 +31,8 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
     private Dictionary<string, NearbyOpponentMatch> _uniqueGamesFound = new Dictionary<string, NearbyOpponentMatch>();
     private IEnumerator _opponentListProcessorCoroutine;
 
+    private HandController _handController;
+
     // Use this for initialization
     void Start () {
         _currentMenu = usernameCaptureMenu;
@@ -38,6 +40,10 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
         _networkDiscovery = FindObjectOfType<OverriddenNetworkDiscovery>();
         _networkDiscovery.AddListener(this);
         _networkDiscovery.broadcastData = _playerName;
+
+        _handController = FindObjectOfType<HandController>();
+
+        //TransitionToGame();
     }
 
     // Update is called once per frame
@@ -87,13 +93,15 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
 
     public void TransitionToHostMatchMenu()
     {
-        _currentMenu.SetActive(false);
-        _currentMenu = hostMatchMenu;
-        _currentMenu.SetActive(true);
+        //_currentMenu.SetActive(false);
+        //_currentMenu = hostMatchMenu;
+        //_currentMenu.SetActive(true);
         Debug.LogWarning("starting networkManager");
         NetworkManager.singleton.StartServer();
         Debug.LogWarning("starting networkDiscovery, broadcast");
         _networkDiscovery.StartAsServer();
+
+        TransitionToGame();
     }
 
     public void TransitionToUsernameCatpureMenu()
@@ -106,10 +114,12 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
     public void TransitionToGame()
     {
         _currentMenu.SetActive(false);
+        _handController.InitializeNewGame();
         _currentMenu = gameMenu;
         _currentMenu.SetActive(true);
     }
 
+    #region Pull this networking stuff outta here!
     public void OnReceivedBroadcast(string fromAddress, string data)
     {
         //var stringBuilder = new StringBuilder();
@@ -162,12 +172,24 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
         //Why do I need to do this?  lame
         opponentListItemInstance.transform.localScale = new Vector3(1, 1, 1);
 
+        opponentListItemInstance.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            JoinGame(fromAddress, data);
+        });
+
         _uniqueGamesFound.Add(fromAddress, new NearbyOpponentMatch() {
             PlayerName = data,
             FromAddress = fromAddress,
             OpponentExpireTime = Time.time + 1.5f,
             OpponentListItemInstance = opponentListItemInstance
         });
+    }
+
+    private void JoinGame(string fromAddress, string data)
+    {
+        NetworkManager.singleton.networkAddress = fromAddress;
+        NetworkManager.singleton.StartClient();
+        TransitionToGame();
     }
 
     private void ProcessBroadcastExistingGameFound(string fromAddress, string data, NearbyOpponentMatch oldData)
@@ -193,7 +215,8 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
                     opponentByHostAddress.Value.OpponentListItemInstance.SetActive(false);
                 }
             }
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(0.33f);
         }
     }
+    #endregion
 }
