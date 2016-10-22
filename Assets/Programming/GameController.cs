@@ -6,10 +6,10 @@ using UnityEngine.Networking;
 using System;
 using Assets.Programming.MatchMaking;
 using System.Text;
+using Assets.Programming;
 
 public class GameController : MonoBehaviour, INetworkBroadcastListener
 {
-
     public GameObject usernameCaptureMenu;
     public GameObject searchForOrHostMatchMenu;
     public GameObject searchForMatchMenu;
@@ -30,8 +30,9 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
 
     private Dictionary<string, NearbyOpponentMatch> _uniqueGamesFound = new Dictionary<string, NearbyOpponentMatch>();
     private IEnumerator _opponentListProcessorCoroutine;
-	// Use this for initialization
-	void Start () {
+
+    // Use this for initialization
+    void Start () {
         _currentMenu = usernameCaptureMenu;
 
         _networkDiscovery = FindObjectOfType<OverriddenNetworkDiscovery>();
@@ -41,47 +42,21 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
 
     // Update is called once per frame
     void Update () {
-        //foreach(var opponentListItem in opponentListContainer.GetComponentsInChildren<Button>())
-        //{
-        //    Destroy(opponentListItem.gameObject);
-        //}
 
-        //if (_networkDiscovery.broadcastsReceived == null)
-        //{
-        //    return;
-        //}
-
-        //var optionNameIndex = 0;
-        //foreach(var addressAndDataPair in _networkDiscovery.broadcastsReceived)
-        //{
-        //    var opponentListItemInstance = Instantiate<GameObject>(opponentListItemPrefab);
-        //    opponentListItemInstance.transform.SetParent(opponentListContainer.transform);
-        //    opponentListItemInstance.name = (optionNameIndex++).ToString();
-        //    var opponentName = System.Text.Encoding.Default.GetString(addressAndDataPair.Value.broadcastData);
-        //    opponentListItemInstance.GetComponentInChildren<Text>().text = opponentName;
-            //			EventTrigger trigger = quizOptionUIInstance.GetComponent<EventTrigger>();
-            //			EventTrigger.Entry entry = new EventTrigger.Entry();
-            //			entry.eventID = EventTriggerType.PointerClick;
-            //			entry.callback.AddListener( (eventData) => { QuizOptionSelected(quizOptionUIInstance); } );
-            //			trigger.triggers.Add(entry);
-            //var quizOptionUIButton = opponentListItemInstance.GetComponent<Button>();
-            //quizOptionUIButton.onClick.AddListener(() => { _gameController.QuizOptionSelected(opponentListItemInstance); });
-            //UpdateButtonStyling(quizOptionUIButton, quizOption);
-        //}
 	}
 
     public void TransitionToSearchOrHostChoiceMenu()
     {
-        if(NetworkManager.singleton.isNetworkActive)
+        if (NetworkManager.singleton.isNetworkActive)
         {
             Debug.LogWarning("stopping networkManager");
             NetworkManager.singleton.StopServer();
         }
-        if(_networkDiscovery.running)
+        if (_networkDiscovery.running)
         {
             Debug.LogWarning("stopping networkDiscovery");
             _networkDiscovery.StopBroadcast();
-            if(_opponentListProcessorCoroutine != null)
+            if (_opponentListProcessorCoroutine != null)
             {
                 Debug.LogWarning("stopping networkDiscovery, stop coroutine to process broadcasts");
                 StopCoroutine(_opponentListProcessorCoroutine);
@@ -128,31 +103,38 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
         _currentMenu.SetActive(true);
     }
 
+    public void TransitionToGame()
+    {
+        _currentMenu.SetActive(false);
+        _currentMenu = gameMenu;
+        _currentMenu.SetActive(true);
+    }
+
     public void OnReceivedBroadcast(string fromAddress, string data)
     {
-        var stringBuilder = new StringBuilder();
-        stringBuilder.Append(fromAddress + " : " + data + "\n");
-        stringBuilder.Append(wtfText.text);
-        var buildText = stringBuilder.ToString();
-        Debug.LogError("existing text: " + wtfText.text);
-        var incommingText = fromAddress + ":" + data.TrimEnd('\0');
-        var s = "hello";
-        s = string.Format("{0} {1}", s, "world");
-        Debug.LogError(s);
-        Debug.LogErrorFormat("{0} , {1} , {2}", wtfText.text, incommingText, UnityEngine.Random.value);
+        //var stringBuilder = new StringBuilder();
+        //stringBuilder.Append(fromAddress + " : " + data + "\n");
+        //stringBuilder.Append(wtfText.text);
+        //var buildText = stringBuilder.ToString();
+        //Debug.LogError("existing text: " + wtfText.text);
+        //var incommingText = fromAddress + ":" + data.TrimEnd('\0');
+        //var s = "hello";
+        //s = string.Format("{0} {1}", s, "world");
+        //Debug.LogError(s);
+        //Debug.LogErrorFormat("{0} , {1} , {2}", wtfText.text, incommingText, UnityEngine.Random.value);
 
-        Debug.LogError("incoming text: " + incommingText);
-        var newText = string.Format("{0} , {1}", incommingText, wtfText.text);
-        Debug.LogError("new      text: " + newText);
-        Debug.LogError(newText);
-        var number = UnityEngine.Random.insideUnitCircle;
-        var concatted = string.Concat(incommingText, wtfText.text);
-        Debug.LogError("concatted text: " + concatted);
-        //wtfText.text = buildText;
-        Debug.LogWarning("Data.length: " + data.TrimEnd('\0'));
-        wtfText.text = string.Format("{0} \n{1}", incommingText, wtfText.text);
-        //wtfText.text = butts;
-        Debug.LogWarning(BitConverter.ToString(Encoding.ASCII.GetBytes(data)));
+        //Debug.LogError("incoming text: " + incommingText);
+        //var newText = string.Format("{0} , {1}", incommingText, wtfText.text);
+        //Debug.LogError("new      text: " + newText);
+        //Debug.LogError(newText);
+        //var number = UnityEngine.Random.insideUnitCircle;
+        //var concatted = string.Concat(incommingText, wtfText.text);
+        //Debug.LogError("concatted text: " + concatted);
+        ////wtfText.text = buildText;
+        //Debug.LogWarning("Data.length: " + data.TrimEnd('\0'));
+        //wtfText.text = string.Format("{0} \n{1}", incommingText, wtfText.text);
+        ////wtfText.text = butts;
+        //Debug.LogWarning(BitConverter.ToString(Encoding.ASCII.GetBytes(data)));
         ProcessBroadcastMessage(fromAddress, data);
     }
 
