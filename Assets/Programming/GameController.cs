@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
         if (NetworkManager.singleton.isNetworkActive)
         {
             Debug.LogWarning("stopping networkManager");
-            NetworkManager.singleton.StopServer();
+            NetworkManager.singleton.StopHost();
         }
         if (_networkDiscovery.running)
         {
@@ -97,7 +97,7 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
         //_currentMenu = hostMatchMenu;
         //_currentMenu.SetActive(true);
         Debug.LogWarning("starting networkManager");
-        NetworkManager.singleton.StartServer();
+        NetworkManager.singleton.StartHost();
         Debug.LogWarning("starting networkDiscovery, broadcast");
         _networkDiscovery.StartAsServer();
 
@@ -111,10 +111,9 @@ public class GameController : MonoBehaviour, INetworkBroadcastListener
         _currentMenu.SetActive(true);
     }
 
-    public void TransitionToGame()
-    {
+    public void TransitionToGame() { 
+
         _currentMenu.SetActive(false);
-        _handController.InitializeNewGame();
         _currentMenu = gameMenu;
         _currentMenu.SetActive(true);
     }

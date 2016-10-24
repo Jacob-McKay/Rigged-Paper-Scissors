@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Programming
 {
-    public enum ValidHand { Rock, Paper, Scissors };
+    public enum ValidHand { Abstain, Rock, Paper, Scissors };
 
     public enum Outcome { Win, Loss, Stalemate }
 
